@@ -1,0 +1,19 @@
+.askAIButton {
+    position: absolute;
+    padding: 8px 12px;
+    background-color: var(--ifm-color-primary);
+    color: white;
+    border: none;
+    border-radius: var(--ifm-button-border-radius);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transform: translateX(-50%); /* Center horizontally */
+    z-index: 1001; /* Above other content */
+    white-space: nowrap;
+}
+
+.askAIButton:hover {
+    background-color: var(--ifm-color-primary-dark);
+}

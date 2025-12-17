@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+cohere
+qdrant-client
+psycopg2-binary
+beautifulsoup4
+requests
+python-dotenv
+slowapi
+SQLAlchemy
+lxml

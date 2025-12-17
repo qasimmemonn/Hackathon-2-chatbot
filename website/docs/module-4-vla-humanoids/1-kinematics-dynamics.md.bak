@@ -1,0 +1,124 @@
+--- 
+sid ebar_position: 1
+---
+
+# Chapter 1: Humanoid Robot Kinematics and Dynamics
+
+## Introduction to Humanoid Robot Modeling
+
+To effectively control and program humanoid robots, a deep understanding of their underlying mathematical models is essential. This chapter delves into the fundamentals of kinematics and dynamics, which describe a robot's motion and the forces/torques that cause it. Kinematic models relate joint angles to end-effector positions, while dynamic models describe the relationship between forces/torques and accelerations.
+
+Humanoid robots are typically **free-floating base** systems, meaning their base (torso) is not rigidly fixed to the ground and its motion must also be accounted for. This contrasts with **fixed-base** manipulators, where the base is stationary, simplifying the modeling process considerably. The free-floating nature introduces six additional degrees of freedom (three for position and three for orientation) for the base, significantly increasing the complexity of their models.
+
+## Kinematics
+
+Kinematics deals with the description of motion without considering the forces that cause it. For a robot, this involves understanding the geometric relationship between its joints and its end-effectors (e.g., hands, feet).
+
+### Forward Kinematics (FK)
+
+**Definition:** Forward kinematics is the process of calculating the position and orientation of the robot's end-effector(s) given the values of all its joint variables (angles for revolute joints, displacements for prismatic joints).
+
+**Purpose:** FK is fundamental for understanding where the robot's limbs are in space, useful for collision detection, visualization, and trajectory planning.
+
+**Denavit-Hartenberg (DH) Parameters:** A widely used convention for systematically assigning coordinate frames to each link of a robot and deriving its kinematic equations. The DH parameters define four values for each link that describe its relationship to the previous link:
+
+*   **a (link length):** The distance between the $$Z_\{i-1\}$$ and $$Z_i$$ axes measured along the $$X_i$$ axis.
+*   **\alpha (link twist):** The angle from the $$Z_\{i-1\}$$ axis to the $$Z_i$$ axis measured about the $$X_i$$ axis.
+*   **d (link offset):** The distance between the $$X_\{i-1\}$$ and $$X_i$$ axes measured along the $$Z_\{i-1\}$$ axis.
+*   **\theta (joint angle):** The angle from the $$X_\{i-1\}$$ axis to the $$X_i$$ axis measured about the $$Z_\{i-1\}$$ axis.
+
+These parameters are used to construct **Homogeneous Transformation Matrices (HTMs)**, which represent the transformation from one link's coordinate frame to the next. A general HTM for a link $$i$$ relative to link $$i-1$$ is given by:
+
+$$ T_\{i-1\}^i(\theta_i, d_i, a_i, \alpha_i) = \begin{bmatrix}
+\cos\theta_i & -\sin\theta_i\cos\alpha_i & \sin\theta_i\sin\alpha_i & a_i\cos\theta_i \\
+\sin\theta_i & \cos\theta_i\cos\alpha_i & -\cos\theta_i\sin\alpha_i & a_i\sin\theta_i \\
+0 & \sin\alpha_i & \cos\alpha_i & d_i \\
+0 & 0 & 0 & 1
+\end{bmatrix} $$
+
+By multiplying these matrices sequentially from the base to the end-effector, we can find the transformation from the base frame to the end-effector frame.
+
+**Example: FK for a simple 2R Manipulator**
+Consider a 2-revolute (2R) planar manipulator with two links of lengths $$L_1$$ and $$L_2$$ and joint angles $$q_1$$ and $$q_2$$. Assuming the first joint is at the origin:
+
+*   $$x = L_1 \cos(q_1) + L_2 \cos(q_1 + q_2)$$
+*   $$y = L_1 \sin(q_1) + L_2 \sin(q_1 + q_2)$$
+
+### Inverse Kinematics (IK)
+
+**Definition:** Inverse kinematics is the process of calculating the joint variables required to achieve a desired position and orientation of the robot's end-effector.
+
+**Purpose:** IK is crucial for task-oriented control, where the robot needs to reach specific points in space (e.g., grasping an object, placing a foot).
+
+**Analytical vs. Numerical IK:**
+
+*   **Analytical IK:** Involves closed-form mathematical solutions. It's fast and provides all possible solutions, but only exists for robots with specific kinematic structures (e.g., 3R planar, 6R spherical wrist). Humanoid robots, with many degrees of freedom, rarely have complete analytical solutions.
+
+*   **Numerical IK (Jacobian-based):** Uses iterative methods to find approximate solutions. It's more general and can handle complex robot structures but can be computationally intensive, may get stuck in local minima, and doesn't guarantee finding all solutions.
+
+**Jacobian Matrix:** The Jacobian matrix ($$J$$) relates joint velocities ($$\dot{q}$$) to end-effector velocities ($$v_e$$) in Cartesian space:
+
+$$ v_e = J(q) \dot{q} $$
+
+For IK, we often use the pseudoinverse of the Jacobian ($$J^{\dagger}$$) to find joint velocities given a desired end-effector velocity:
+
+$$ \dot{q} = J^{\dagger}(q) v_e $$
+
+The Jacobian also plays a critical role in identifying **singularities**, configurations where the robot loses one or more degrees of freedom in its end-effector motion (e.g., a fully extended arm), making it impossible to move in certain directions.
+
+**Pseudoinverse Jacobian for Redundant Manipulators:** Humanoid robots typically have more degrees of freedom than strictly necessary to position an end-effector (redundancy). The pseudoinverse allows us to find a least-squares solution for joint velocities, and it can also be extended to optimize secondary tasks (e.g., avoiding joint limits) while achieving the primary end-effector task.
+
+## Dynamics
+
+Dynamics deals with the study of motion considering the forces and torques that cause it. For humanoid robots, this is essential for understanding how much force is needed at each joint to achieve a desired motion or to maintain balance.
+
+### Lagrangian Dynamics
+
+Lagrangian dynamics is an energy-based approach to derive the equations of motion. It is particularly elegant for systems with many degrees of freedom.
+
+*   **Lagrangian (L):** Defined as the difference between the system's kinetic energy (K) and potential energy (P): $$L = K - P$$.
+*   **Euler-Lagrange Equations:** These equations relate the generalized coordinates ($$q$$), generalized velocities ($$\dot{q}$$), and generalized forces ($$\tau$$) to the Lagrangian:
+
+$$ \frac{d}{dt} \left( \frac{\partial L}{\partial \dot{q_i}} \right) - \frac{\partial L}{\partial q_i} = \tau_i $$
+
+*   **Derivation Example:** For a simple pendulum, the kinetic energy is $$K = \frac{1}{2}m L^2 \dot{\theta}^2$$ and potential energy is $$P = -mgL\cos\theta$$. Applying the Euler-Lagrange equation yields the well-known equation of motion for a pendulum.
+
+### Newton-Euler Dynamics
+
+Newton-Euler dynamics is a force-and-moment-based approach that applies Newton's second law and Euler's rotational equations to each link of the robot. It is often more intuitive for visualizing forces and is computationally efficient for inverse dynamics (calculating joint torques given accelerations).
+
+*   **Recursive Newton-Euler Algorithm (RNEA):** This algorithm efficiently computes the joint torques required to produce a desired motion. It involves two passes: an outward pass from the base to the end-effector to calculate velocities and accelerations, and an inward pass from the end-effector to the base to calculate forces and torques.
+
+### Equation of Motion for Humanoids
+
+The general equation of motion for a free-floating humanoid robot, taking into account contact forces, can be expressed as:
+
+$$ M(q)\ddot{q} + C(q, \dot{q})\dot{q} + G(q) = \tau + J_c^T F_c $$
+
+Let's break down each term:
+
+*   $$M(q)$$: The **Mass Matrix** (or inertia matrix), which is a symmetric, positive-definite matrix that represents the robot's inertia. It depends on the robot's configuration ($$q$$).
+*   $$C(q, \dot{q})\dot{q}$$: Represents **Coriolis and Centrifugal forces**, which arise from the rotation of the coordinate frames and the motion of the links. These are velocity-dependent terms.
+*   $$G(q)$$: Represents the **gravitational forces** acting on the robot's links, dependent on the robot's configuration.
+*   $$\tau$$: The vector of **joint torques** (or forces for prismatic joints) applied by the robot's actuators.
+*   $$J_c^T F_c$$: Represents the **generalized forces arising from external contact forces** ($$F_c$$) acting on the robot's contact points (e.g., feet, hands). $$J_c$$ is the Jacobian matrix relating joint velocities to the velocities of the contact points, and $$J_c^T$$ is its transpose.
+
+This equation forms the basis for model-based control strategies, where controllers aim to determine the joint torques ($$\tau$$) required to achieve desired accelerations ($$\ddot{q}$$) while managing contact forces.
+
+## Challenges in Humanoid Dynamics
+
+Modeling and controlling humanoid dynamics come with unique challenges:
+
+*   **High Dimensionality:** Humanoids have many degrees of freedom, leading to large and complex mass, Coriolis, and gravity matrices.
+*   **Underactuation (Free-Floating Base):** The base (torso) is not directly actuated but moves as a result of internal joint movements and external contact forces. This makes control more challenging than for fixed-base robots.
+*   **Contact Dynamics:** Modeling interactions with the environment (friction, impacts, transitions between contact states) is notoriously difficult and often involves hybrid dynamics approaches.
+
+## Conclusion
+
+Kinematics and dynamics provide the essential mathematical framework for understanding, simulating, and controlling humanoid robots. From planning end-effector trajectories with IK to computing the necessary joint torques with dynamic models, these concepts are foundational for building agile and stable bipedal machines. As robots become more complex and interact more intimately with unstructured environments, the accuracy and efficiency of these models will continue to be paramount.
+
+## Exercises
+
+1.  Given a 3-link planar manipulator with revolute joints, describe the process of deriving its forward kinematics using Denavit-Hartenberg parameters. You do not need to provide the full derivation, but outline the steps and the type of information required for each parameter.
+2.  Explain the difference between analytical and numerical inverse kinematics solutions. In what scenarios would you choose one over the other for a humanoid robot, and what are the respective advantages and disadvantages?
+3.  Break down the general equation of motion for a free-floating humanoid robot ($$M(q)\ddot{q} + C(q, \dot{q})\dot{q} + G(q) = \tau + J_c^T F_c$$) by explaining what each term represents physically and mathematically. Why is the contact force term ($$J_c^T F_c$$) particularly important for humanoid robots?

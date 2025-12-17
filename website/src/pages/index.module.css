@@ -1,0 +1,81 @@
+/**
+ * CSS files with the .module.css suffix will be treated as CSS modules
+ * and scoped locally.
+ */
+
+.heroBanner {
+  padding: 4rem 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+@media screen and (max-width: 996px) {
+  .heroBanner {
+    padding: 2rem;
+  }
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.courseOverviewHeading {
+  color: var(--ifm-color-primary-darkest);
+  margin-top: 2rem;
+}
+
+.moduleLink {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  padding: 0; /* Remove padding from link, let card handle it */
+  border-radius: 8px;
+  transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.moduleLink h3 {
+  color: var(--ifm-color-primary-dark);
+}
+
+.moduleCard {
+  background-color: var(--ifm-background-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: var(--ifm-global-shadow-lw);
+  min-height: 450px; /* Set a minimum height to standardize card sizes */
+  width: 100%; /* Ensure card takes full width of its parent column */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  border: 1px solid var(--ifm-color-emphasis-200); /* Add a subtle border */
+  transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.moduleLink:hover .moduleCard {
+  border-color: var(--ifm-color-primary-darkest); /* Change only border color on hover */
+  transform: translateY(-5px);
+  box-shadow: var(--ifm-global-shadow-md);
+}
+
+.features {
+  margin-bottom: 3rem; /* Add bottom margin to create space from the footer */
+}
+
+/* Ensure modules stack on very small screens */
+@media screen and (max-width: 768px) {
+  .col--6 {
+    flex: 0 0 100%;
+    max-width: 100%;
+    margin-bottom: 3rem; /* Further increased vertical margin for small screens */
+  }
+}
+
+@media screen and (min-width: 769px) {
+  .col--6 {
+    padding: 0 0.5rem; /* Add horizontal padding to create space between cards */
+    margin-bottom: 3rem; /* Further increased vertical margin for larger screens */
+  }
+}

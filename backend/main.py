@@ -39,18 +39,15 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # -------------------------------------------------
-# CORS
+# CORS (FIXED)
 # -------------------------------------------------
-
-# Vercel frontend URL + optional localhost
-origins = [
-    "https://physical-ai-book-swart.vercel.app/",  # Vercel frontend URL
-    "http://localhost:3000",  # for local testing
-]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=[
+        "https://physical-ai-book-swart.vercel.app",
+        "http://localhost:3000",
+    ],
+    allow_credentials=False,   # IMPORTANT
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -72,10 +69,11 @@ async def ingest_data():
 
 @app.post("/chat", response_model=ChatResponse)
 @limiter.limit("5/minute")
-async def chat(request: Request, payload: ChatRequest, db: Session = Depends(get_db)):
-    """
-    Chat endpoint with proper SlowAPI support.
-    """
+async def chat(
+    request: Request,                 # MUST BE FIRST
+    payload: ChatRequest,
+    db: Session = Depends(get_db)
+):
     try:
         chat_session_id = payload.chat_session_id
 
@@ -89,33 +87,36 @@ async def chat(request: Request, payload: ChatRequest, db: Session = Depends(get
         else:
             chat_session = db.query(ChatSession).filter(ChatSession.id == chat_session_id).first()
             if not chat_session:
-                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Chat session not found.")
+                raise HTTPException(status_code=404, detail="Chat session not found.")
 
         # Store user message
-        db.add(ChatMessage(chat_session_id=chat_session_id, role="user", content=payload.query))
+        db.add(ChatMessage(
+            chat_session_id=chat_session_id,
+            role="user",
+            content=payload.query
+        ))
         db.commit()
 
         # RAG response
         rag_result = get_rag_response(payload.query)
         answer = rag_result.get("answer", "No answer found in book content.")
         documents = rag_result.get("documents", [])
-        
-        # If documents were returned under 'sources' key, map them
-        if not documents and "sources" in rag_result:
-             # Map simple sources to Document format if possible, or just ignore for now if structure is different
-             # But ChatResponse expects Document(id, title, url, text). 
-             # rag.py sources only have url, title. 
-             # So we cannot easily map them without faking id/text.
-             pass
 
         # Store assistant message
-        db.add(ChatMessage(chat_session_id=chat_session_id, role="assistant", content=answer))
+        db.add(ChatMessage(
+            chat_session_id=chat_session_id,
+            role="assistant",
+            content=answer
+        ))
         db.commit()
 
-        return ChatResponse(answer=answer, chat_session_id=chat_session_id, documents=documents)
+        return ChatResponse(
+            answer=answer,
+            chat_session_id=chat_session_id,
+            documents=documents
+        )
+
     except Exception as e:
-        import traceback
-        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
 

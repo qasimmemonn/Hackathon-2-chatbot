@@ -3,7 +3,7 @@ import styles from './ChatWidget.module.css';
 
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
     ? 'https://your-production-backend-url.vercel.app' // TODO: Replace with actual production URL
-    : 'http://localhost:8000';
+    : 'https://memonkhan-chatbot-hackathon.hf.space';
 
 const ChatWidget = ({ initialInput, isOpen, setIsOpen }) => {
     const [messages, setMessages] = useState([]);

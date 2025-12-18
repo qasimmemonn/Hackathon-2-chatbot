@@ -41,11 +41,12 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # -------------------------------------------------
 # CORS
 # -------------------------------------------------
-origins = [
-    "http://localhost:3000",
-    os.getenv("DOCUSAURUS_DOMAIN"),
-]
 
+# Vercel frontend URL + optional localhost
+origins = [
+    "https://physical-ai-book-swart.vercel.app/",  # Vercel frontend URL
+    "http://localhost:3000",  # for local testing
+]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

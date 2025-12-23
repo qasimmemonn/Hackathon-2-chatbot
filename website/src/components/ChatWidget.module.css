@@ -1,4 +1,4 @@
-/*           .chatWidgetContainer { 
+ .chatWidgetContainer { 
     position: fixed;
     bottom: 20px;
     right: 20px;
@@ -10,7 +10,7 @@
     color: white;
     border: none;
     border-radius: 50%; /* Circular */
- /*              width: 60px;
+    width: 60px;
     height: 60px;
     display: flex;
     align-items: center;
@@ -67,7 +67,7 @@
     color: var(--ifm-font-color-secondary);
     font-style: italic;
     margin-top: auto; /* Push to bottom for initial display */
- /*                margin-bottom: auto;
+    margin-bottom: auto;
 }
 
 .message {
@@ -143,10 +143,10 @@
     margin-right: 10px;
     font-size: 14px;
     resize: none; /* Disable textarea resizing by user */
- /*                   overflow-y: hidden; /* Hide scrollbar initially */
- /*                   min-height: 40px;
- /*                     max-height: 100px; /* Limit height to prevent excessive growth */
- /*                    background-color: var(--ifm-background-surface-color);
+    overflow-y: hidden; /* Hide scrollbar initially */
+    min-height: 40px;
+    max-height: 100px; /* Limit height to prevent excessive growth */
+    background-color: var(--ifm-background-surface-color);
     color: var(--ifm-font-color-base);
 }
 
@@ -166,9 +166,9 @@
     font-size: 14px;
     transition: background-color 0.3s ease;
     flex-shrink: 0; /* Prevent button from shrinking */
-/*   }
-
-/*                .sendButton:hover:not(:disabled) {
+  }
+      
+.sendButton:hover:not(:disabled) {
     background-color: var(--ifm-color-primary-dark);
 }
 

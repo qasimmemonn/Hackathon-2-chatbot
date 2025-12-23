@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+/*                    import React, { useState, useEffect, useRef } from 'react';
 import styles from './askAI.module.css';
 
 const AskAIButton = ({ onAskAI }) => {
@@ -62,4 +62,4 @@ const AskAIButton = ({ onAskAI }) => {
   );
 };
 
-export default AskAIButton;
+export default AskAIButton; */
